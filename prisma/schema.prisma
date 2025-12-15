@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String
+  email        String    @unique
+  imageUrl     String?
+  articles     Article[]
+  createAt     DateTime  @default(now())
+  updateAt     DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Article {
+  id         String   @id @default(cuid())
+  title      String
+  content    String
+  coverImage String?
+  likes      Int      @default(0)
+  author     User     @relation(fields: [authorId], references: [id])
+  authorId   String
+  tag        Tag?     @relation(fields: [tagId], references: [id])
+  tagId      String?
+  createAt   DateTime @default(now())
+  updateAt   DateTime @updatedAt
+
+  @@map("articles")
+}
+
+model Tag {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  articles Article[] @relation(references: [id])
+  createAt DateTime  @default(now())
+  updateAt DateTime  @updatedAt
+
+  @@map("tags")
+}
